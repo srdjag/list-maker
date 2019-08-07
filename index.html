@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Custom List Maker</title>
+    <meta name="description" content="Create your custom table and fill it in with data">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Srdja Gunjic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css">
+    <link rel="icon" href="https://png.icons8.com/metro/1600/list.png" type="image/x-icon" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
+</head>
+
+<body>
+    <div class="color-changer ui black button">Change Background Color</div>
+    <input class="jscolor">
+    <button class="reset">Reset</button>
+    <button class="close">Close</button>
+    <div class="ui container">
+
+        <form action="" method="POST" class="ui inverted form set-fields">
+            <div class="ui large buttons">
+                <div id="add-field" class="ui button">Add Field</div>
+                <div class="or"></div>
+                <input class="ui green button" type="submit" value="Create List">
+            </div>
+            <br>
+            <br>
+            <div class="fieldsList">
+                <div class="two fields">
+                    <div class="field">
+                        <label>Field Name</label>
+                        <input required type="text" value="" id="0" placeholder="Field Name" class="new-field" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label>Type</label>
+                        <select id="0" class="ui fluid dropdown new-field-value">
+                            <option value="text">Text</option>
+                            <option value="Number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="time">Time</option>
+                            <option value="checkbox">Checkbox</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+        </form>
+
+        <form action="" method="POST" class="ui inverted form add-to-list">
+            <div id="addToListInner" class="equal width fields">
+            </div>
+
+            <button class="ui compact labeled icon button">
+                <i class="plus icon"></i>
+                Add to list
+            </button>
+
+        </form>
+        <br>
+        <button class="ui red button" type="submit" id="deleteForm" onClick="deleteForm()">Delete Current List</button>
+        <br>
+
+        <table class="ui celled table">
+            <thead>
+                <tr></tr>
+            </thead>
+            <tbody class="tbody">
+
+            </tbody>
+    </div>
+</body>
+<script async defer>
+
+    var arrayOfObjects = [];
+    var fieldsArray = [];
+    var currentID = 1;
+
+    fieldsArray = JSON.parse((localStorage.getItem("arrayOfFields")));
+
+    if (fieldsArray == null) {
+        fieldsArray = [];
+    }
+
+    if (localStorage.getItem("arrayOfObjects")) {
+        arrayOfObjects = JSON.parse(localStorage.getItem("arrayOfObjects"));
+    }
+
+    //Initialize Object
+    function Object() {
+
+    }
+
+    //Add object properties
+    fieldsArray.forEach(function (field, index) {
+        Object[index] = field;
+    });
+
+    //ID Generator
+    function ID() {
+        return Math.random().toString(36).substr(2, 9);
+    };
+
+    function deleteForm() {
+        var result = confirm("Do you really want to delete current list?");
+
+        if (result) {
+            localStorage.removeItem("addToListForm");
+            localStorage.removeItem("arrayOfFields");
+            localStorage.removeItem("arrayOfObjects");
+
+            document.querySelector(".set-fields").style.display = "block";
+            document.querySelector("#addToListInner").innerHTML = "";
+            document.querySelector(".add-to-list").style.display = "none";
+            document.querySelector("#deleteForm").style.display = "none";
+            document.querySelector("table").style.visibility = "hidden";
+
+            document.querySelector(".fieldsList").innerHTML = `
+            <div class="two fields">
+                    <div class="field">
+                        <label>Field Name</label>
+                        <input required type="text" value="" id="0" placeholder="Field Name" class="new-field" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label>Type</label>
+                        <select id="0" class="ui fluid dropdown new-field-value">
+                            <option value="text">Text</option>
+                            <option value="Number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="time">Time</option>
+                            <option value="checkbox">Checkbox</option>
+                        </select>
+                    </div>
+                </div>`
+            document.querySelector("tbody").innerHTML = "";
+
+        }
+
+
+    }
+
+    function addField() {
+        var newFieldName = document.createElement("INPUT");
+        var newFieldValue = document.createElement("SELECT");
+        var twoFields = document.createElement("DIV");
+        var fieldOne = document.createElement("DIV");
+        var fieldTwo = document.createElement("DIV");
+
+        fieldOne.classList.add("field");
+        fieldTwo.classList.add("field");
+        twoFields.classList.add("two");
+        twoFields.classList.add("fields");
+
+        newFieldName.setAttribute("placeholder", "Field Name");
+        newFieldName.setAttribute("type", "text");
+        newFieldName.setAttribute("class", "new-field");
+        newFieldName.setAttribute("required", "true");
+        newFieldName.setAttribute("id", currentID);
+        newFieldName.setAttribute("autocomplete", "off");
+
+        newFieldValue.setAttribute("class", "new-field-value ui fluid dropdown");
+        newFieldValue.setAttribute("required", "true");
+        newFieldValue.setAttribute("id", currentID);
+        newFieldValue.setAttribute("autocomplete", "off");
+        newFieldValue.innerHTML = `
+            <option value="text">Text</option>
+            <option value="number">Number</option>
+            <option value="date">Date</option>
+            <option value="time">Time</option>
+            <option value="checkbox">Checkbox</option>`
+        currentID++;
+
+        fieldOne.appendChild(newFieldName);
+        fieldTwo.appendChild(newFieldValue);
+        twoFields.appendChild(fieldOne);
+        twoFields.appendChild(fieldTwo);
+        document.querySelector(".fieldsList").appendChild(twoFields);
+    }
+
+    function setFields(e) {
+        e.preventDefault();
+        arrayOfFields = [];
+        arrayOfObjects = [];
+
+        localStorage.removeItem("arrayOfObjects");
+
+        let fieldsDiv = document.querySelector("#addToListInner");
+        let nodelist = document.querySelectorAll('.new-field');
+        let nodelistToArray = Array.apply(null, nodelist);
+        let nodelistOfTypes = document.querySelectorAll('.new-field-value');
+        let nodelistOfTypesToArray = Array.apply(null, nodelistOfTypes);
+
+        nodelistToArray.forEach(function (inputField, index) {
+            arrayOfFields.push({ "name": inputField.value, "type": nodelistOfTypesToArray[index].value });
+        });
+
+
+        localStorage.setItem("arrayOfFields", JSON.stringify(arrayOfFields))
+
+        arrayOfFields.forEach(function (field, index) {
+
+            let currentField = document.createElement("DIV");
+            currentField.classList.add('field');
+            currentField.innerHTML = `
+                    <label>${field.name}</label>
+                    <input type="${field.type}" id="input-${index}" placeholder="${field.name}" autocomplete="off">
+            `;
+
+            if (field.type == "checkbox") {
+
+                currentField.innerHTML = `
+                    <label>${field.name}</label>
+                    <div class="ui toggle checkbox" style="display: flex; justify-content: center; align-items: center; height: 38px; width: 100%; border-radius: 5px; background-color: white;">
+                        <input type="checkbox" style="width: 100%; height: 3rem;" checked id="input-${index}">
+                        <label></label> 
+                    </div>
+            `;
+            }
+
+            fieldsDiv.appendChild(currentField);
+
+        });
+
+        //Show/Hide components
+        document.querySelector(".set-fields").style.display = "none";
+        document.querySelector(".add-to-list").style.display = "block";
+        document.querySelector("#deleteForm").style.display = "block";
+
+        localStorage.setItem("addToListForm", document.querySelector("#addToListInner").innerHTML);
+        document.querySelector("#addToListInner").innerHTML = localStorage.getItem("addToListForm");
+        document.querySelector("table").style.visibility = "visible";
+
+
+        getLocal();
+    }
+
+
+
+    function addToList(e) {
+
+        e.preventDefault();
+        let newObject = new Object();
+
+        fieldsArray.forEach(function (field, index) {
+            let inputField = document.getElementById("input-" + index);
+            let inputValue = inputField.value;
+
+            if (inputField.getAttribute("type") == "checkbox") {
+                if (inputField.checked == true) {
+                    inputValue = "Yes";
+                } else {
+                    inputValue = "No";
+                }
+            }
+
+            newObject[index] = inputValue;
+            newObject.id = ID();
+        });
+
+        arrayOfObjects.push(JSON.stringify(newObject));
+
+
+        localStorage.setItem("arrayOfObjects", JSON.stringify(arrayOfObjects));
+
+        getLocal()
+    }
+
+    function getLocal() {
+
+        fieldsArray = JSON.parse((localStorage.getItem("arrayOfFields")));
+
+        if (fieldsArray == null) {
+            fieldsArray = [];
+        }
+
+        if (localStorage.getItem("addToListForm")) {
+            if (document.querySelector(".new-field")) {
+                document.querySelector(".set-fields").style.display = "none";
+                document.querySelector("#addToListInner").innerHTML = localStorage.getItem("addToListForm");
+                document.querySelector(".add-to-list").style.display = "block";
+                document.querySelector("#deleteForm").style.display = "block";
+                document.querySelector("table").style.visibility = "visible";
+            }
+
+        }
+        let tbody = document.querySelector(".tbody");
+        let theadTr = document.querySelector("thead tr");
+
+        tbody.innerHTML = "";
+        theadTr.innerHTML = "";
+
+        fieldsArray.forEach(function (field, index) {
+
+            let th = document.createElement("TH");
+            th.classList.add("center");
+            th.classList.add("aligned");
+            th.appendChild(document.createTextNode(field.name));
+            theadTr.appendChild(th);
+
+        });
+
+        if (localStorage.getItem("arrayOfObjects")) {
+            arrayOfObjects = JSON.parse(localStorage.getItem("arrayOfObjects"));
+        }
+
+        //Looping through objects
+
+        arrayOfObjects.forEach(function (object, index) {
+            let span = document.createElement("SPAN");
+            let tr = document.createElement("TR");
+            let id = JSON.parse(object).id;
+
+            //Looping through fields array, matching their Indexes and outputing table rows with data
+
+            for (i = 0; i < fieldsArray.length; i++) {
+
+                let parsedIndex = JSON.parse(object)[i]
+
+                let td = document.createElement("TD");
+
+                let tdContent = document.createTextNode(parsedIndex);
+
+                td.appendChild(tdContent);
+                tr.appendChild(td);
+
+                if (td.innerHTML == "Yes") {
+                    td.classList.add("positive");
+                } else if (td.innerHTML == "No") {
+                    td.classList.add("negative");
+                }
+
+
+                tbody.appendChild(tr);
+            }
+
+            span.appendChild(document.createTextNode("X"));
+            tr.setAttribute("data-id", id);
+            tr.appendChild(span);
+
+            span.addEventListener("click", function () {
+                span.parentElement.remove();
+                let _id = this.parentElement.getAttribute("data-id");
+                span.parentElement.remove();
+
+                arrayOfObjects.forEach(function (object, index) {
+                    if (JSON.parse(object).id == _id) {
+                        arrayOfObjects.splice(index, 1);
+                        localStorage.setItem("arrayOfObjects", JSON.stringify(arrayOfObjects));
+                    }
+                });
+
+            });
+        });
+
+    }
+
+
+    document.querySelector("#add-field").addEventListener("click", (e) => {
+        addField();
+    });
+
+    document.querySelector(".set-fields").addEventListener("submit", (e) => {
+        setFields(e);
+    });
+
+    document.querySelector(".add-to-list").addEventListener("submit", (e) => {
+        addToList(e);
+    });
+
+    window.onload = getLocal;
+
+
+
+</script>
+
+<script async defer>
+
+    function bgChanger() {
+        let colorChanger = document.querySelector(".color-changer");
+        let body = document.querySelector("body");
+        let jscolor = document.querySelector(".jscolor");
+        let btnReset = document.querySelector(".reset");
+        let btnClose = document.querySelector(".close");
+
+        colorChanger.addEventListener("click", () => {
+            colorChanger.style.display = "none";
+            jscolor.style.display = "block";
+            btnReset.style.display = "block";
+            btnClose.style.display = "block";
+        });
+        jscolor.addEventListener("change", () => {
+            localStorage.setItem("bg-color", jscolor.value);
+            body.style.backgroundImage = "none";
+            body.style.backgroundColor = "#" + localStorage.getItem("bg-color");
+        });
+        btnReset.addEventListener("click", () => {
+            localStorage.removeItem("bg-color");
+            body.style.backgroundColor = "none";
+            body.style.backgroundImage = "linear-gradient(-225deg, #22E1FF 0%, #1D8FE1 48%, #625EB1 100%)";
+        })
+        btnClose.addEventListener("click", () => {
+            colorChanger.style.display = "block";
+            jscolor.style.display = "none";
+            btnReset.style.display = "none";
+            btnClose.style.display = "none";
+        });
+        if (localStorage.getItem("bg-color")) {
+            body.style.backgroundImage = "none";
+            body.style.backgroundColor = "#" + localStorage.getItem("bg-color");
+        }
+    }
+
+    bgChanger();
+
+</script>
+<style>
+    table {
+        visibility: hidden;
+    }
+
+    #deleteForm {
+        display: none;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+
+    }
+
+    .add-to-list {
+        display: none;
+    }
+
+    .color-changer {
+        position: absolute;
+        bottom: 0;
+        cursor: pointer;
+        margin: 10px !important;
+    }
+
+    .jscolor {
+        position: absolute;
+        display: none;
+        bottom: 0;
+        left: 0;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+    }
+
+    button.reset {
+        position: absolute;
+        display: none;
+        bottom: 0;
+        left: 200px;
+        padding: 12px;
+        margin: 10px;
+        background-color: #008CBA;
+        color: white;
+        border: none !important;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button.close {
+        position: absolute;
+        display: none;
+        bottom: 0;
+        left: 266px;
+        padding: 12px;
+        margin: 10px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    body {
+        padding-top: 100px;
+        background-image: linear-gradient(-225deg, #22E1FF 0%, #1D8FE1 48%, #625EB1 100%);
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: auto;
+        width: 100vw;
+    }
+
+    span {
+        position: absolute;
+        margin-top: 11px;
+        margin-left: -32px;
+        font-weight: bold;
+        cursor: pointer;
+        opacity: 0;
+        color: white;
+        background-color: red;
+        padding: 2px 6px;
+        border-radius: 100%;
+        transition: all 0.2s ease-in-out;
+    }
+
+    tr:hover>span {
+        opacity: 1;
+
+    }
+
+    tr:nth-of-type(even) {
+        background-color: rgb(248, 248, 248)
+    }
+
+    tr:hover {
+        background-color: rgb(235, 235, 235)
+    }
+
+    @media only screen and (max-width: 720px) {
+        body {
+            padding: 10px;
+        }
+    }
+</style>
+
+</html>
